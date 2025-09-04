@@ -2,12 +2,10 @@ import express from "express";
 import swaggerUi from "swagger-ui-express";
 import swaggerOutput from "../swagger-output.json" with { type: "json" };
 import cors from "cors";
-import todosRouter from "./app/routes/todos.routes.js";
-import { notFound } from "./middlewares/notFound.middleware.js";
-import { errorHandler } from "./middlewares/errorHandler.middleware.js";
-import { Database } from "./connectors/postgresBD.js";
+import todosRouter from "./app/routes/todos.routes";
+import { notFound } from "./middlewares/notFound.middleware";
+import { errorHandler } from "./middlewares/errorHandler.middleware";
 
-await Database.instance.connect();
 const app = express();
 
 app.use(cors());

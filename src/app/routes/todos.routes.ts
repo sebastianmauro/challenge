@@ -1,6 +1,5 @@
-// src/app/routes/todos.routes.ts
 import { Router } from "express";
-import * as controller from "../controllers/todos.controllers.js";
+import * as controller from "../controllers/todos.controllers";
 
 const router = Router();
 
@@ -79,5 +78,31 @@ router.get("/:id", controller.getById);
  *         description: Datos de entrada inválidos.
  */
 router.post("/", controller.create);
+
+/**
+ * @swagger
+ * /api/v1/todos/portfolio/{param}:
+ *   get:
+ *     summary: retorna param
+ *     description: Devuelve un To-Do específico por su ID.
+ *     tags: [To-Dos]
+ *     parameters:
+ *       - in: path
+ *         name: param
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: El param
+ *     responses:
+ *       200:
+ *         description: To-Do encontrado y devuelto.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Todo'
+ *       404:
+ *         description: To-Do no encontrado.
+ */
+router.get("/portfolio/:param", controller.test);
 
 export default router;

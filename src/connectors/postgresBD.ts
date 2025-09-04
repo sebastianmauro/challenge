@@ -10,14 +10,20 @@ export class Database {
 
   private constructor() {
     const connectionString = process.env.DATABASE_URL;
+    if (!connectionString) {
+      throw new Error("DATABASE_URL is required");
+    }
     this.pool = new Pool({ connectionString });
   }
 
   public static get instance(): Database {
-    if (!this._instance) {
-      this._instance = new Database();
-    }
+    if (!this._instance) this._instance = new Database();
     return this._instance;
+  }
+
+  // for tests
+  public static reset(): void {
+    this._instance = null;
   }
 
   public async connect(): Promise<void> {
@@ -35,7 +41,7 @@ export class Database {
     return { rows: res.rows };
   }
 
-  async close(): Promise<void> {
+  public async close(): Promise<void> {
     if (this.closed) return;
     this.closed = true;
     await this.pool.end();
