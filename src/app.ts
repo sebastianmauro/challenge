@@ -2,7 +2,7 @@ import express from "express";
 import swaggerUi from "swagger-ui-express";
 import swaggerOutput from "../swagger-output.json" with { type: "json" };
 import cors from "cors";
-import brokerageRouter from "./app/routes/brokerage.routes";
+import brokerageRouter from "./app/routes/brokerages.routes";
 import { notFound } from "./middlewares/notFound.middleware";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
 
