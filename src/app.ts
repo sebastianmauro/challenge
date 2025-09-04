@@ -5,7 +5,9 @@ import cors from "cors";
 import todosRouter from "./app/routes/todos.routes.js";
 import { notFound } from "./middlewares/notFound.middleware.js";
 import { errorHandler } from "./middlewares/errorHandler.middleware.js";
+import { Database } from "./connectors/postgresBD.js";
 
+await Database.instance.connect();
 const app = express();
 
 app.use(cors());
