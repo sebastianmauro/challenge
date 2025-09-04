@@ -47,7 +47,7 @@ afterAll(async () => {
 
 describe("GET /portfolio/:userId", () => {
   it("devuelve posiciones y total para el usuario 1", async () => {
-    const res = await request(app).get("/api/v1/todos/portfolio/1").expect(200);
+    const res = await request(app).get("/api/portfolio/1").expect(200);
 
     expect(res.body.data).toBe(1);
   });
