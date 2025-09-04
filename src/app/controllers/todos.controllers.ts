@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { z } from "zod";
-import { todoCreateSchema, todoUpdateSchema } from "../schemas/todo.schema.js";
-import { ConflictError } from "../errors/appErrors.js";
+import { todoCreateSchema, todoUpdateSchema } from "../schemas/todo.schema";
+import { Database } from "../../connectors/postgresBD";
 
 // In‑memory store (reemplaza por DB real cuando quieras)
 let SEQ = 1;
@@ -50,4 +49,17 @@ export async function remove(req: Request, res: Response, next: NextFunction) {
   if (!todos.has(id)) return res.status(404).json({ error: "Not found" });
   todos.delete(id);
   res.status(204).send();
+}
+
+export async function test(req: Request, res: Response, next: NextFunction) {
+  await Database.instance.connect();
+  const r: any = (
+    await Database.instance.query(
+      "SELECT " + Number(req.params.param) + " AS value;"
+    )
+  ).rows;
+  if (!r) return res.status(404).json({ error: "Not found" });
+  const value = r[0]?.value;
+  console.log(value); //1
+  res.json({ data: value });
 }

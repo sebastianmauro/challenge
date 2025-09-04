@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
-import app from "./app.js";
-import { Database } from "./connectors/postgresBD.js";
+import app from "./app";
+import { Database } from "./connectors/postgresBD";
 
 dotenv.config();
 
