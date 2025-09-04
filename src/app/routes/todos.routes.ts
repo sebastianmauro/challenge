@@ -1,7 +1,8 @@
 import { Router } from "express";
-import * as controller from "../controllers/todos.controllers";
+import { TodoController } from "../controllers/todos.controllers";
 
 const router = Router();
+const controller = new TodoController();
 
 /**
  * @swagger
@@ -20,7 +21,7 @@ const router = Router();
  *               items:
  *                 $ref: '#/components/schemas/Todo'
  */
-router.get("/", controller.list);
+router.get("/", controller.list.bind(controller));
 
 /**
  * @swagger
@@ -46,7 +47,7 @@ router.get("/", controller.list);
  *       404:
  *         description: To-Do no encontrado.
  */
-router.get("/:id", controller.getById);
+router.get("/:id", controller.getById.bind(controller));
 
 /**
  * @swagger
@@ -77,7 +78,7 @@ router.get("/:id", controller.getById);
  *       400:
  *         description: Datos de entrada inválidos.
  */
-router.post("/", controller.create);
+router.post("/", controller.create.bind(controller));
 
 /**
  * @swagger
@@ -103,6 +104,6 @@ router.post("/", controller.create);
  *       404:
  *         description: To-Do no encontrado.
  */
-router.get("/portfolio/:param", controller.test);
+router.get("/portfolio/:param", controller.test.bind(controller));
 
 export default router;

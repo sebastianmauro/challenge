@@ -2,64 +2,116 @@ import { Request, Response, NextFunction } from "express";
 import { todoCreateSchema, todoUpdateSchema } from "../schemas/todo.schema";
 import { Database } from "../../connectors/postgresBD";
 
-// In‑memory store (reemplaza por DB real cuando quieras)
-let SEQ = 1;
-const todos = new Map<number, { id: number; title: string; done: boolean }>();
+type Todo = { id: number; title: string; done: boolean };
 
-export async function list(_req: Request, res: Response) {
-  res.json({ data: Array.from(todos.values()) });
-}
+export class TodoController {
+  private seq = 1;
+  private todos = new Map<number, Todo>();
+  private db: Database = Database.instance;
 
-export async function getById(req: Request, res: Response, next: NextFunction) {
-  const id = Number(req.params.id);
-  const todo = todos.get(id);
-  if (!todo) return res.status(404).json({ error: "Not found" });
-  res.json({ data: todo });
-}
+  constructor() {
+    this.db.connect();
+  }
 
-export async function create(req: Request, res: Response, next: NextFunction) {
-  const payload = todoCreateSchema.parse(req.body);
-  const id = SEQ++;
-  const todo = { id, title: payload.title, done: false };
-  todos.set(id, todo);
-  res.status(201).json({ data: todo });
-}
+  private parseId(req: Request): number {
+    return Number(req.params.id);
+  }
 
-export async function replace(req: Request, res: Response, next: NextFunction) {
-  const id = Number(req.params.id);
-  if (!todos.has(id)) return res.status(404).json({ error: "Not found" });
-  const payload = todoCreateSchema.parse(req.body);
-  const todo = { id, title: payload.title, done: false };
-  todos.set(id, todo);
-  res.json({ data: todo });
-}
+  async list(req: Request, res: Response, _next: NextFunction): Promise<void> {
+    res.json({ data: Array.from(this.todos.values()) });
+  }
 
-export async function update(req: Request, res: Response, next: NextFunction) {
-  const id = Number(req.params.id);
-  const current = todos.get(id);
-  if (!current) return res.status(404).json({ error: "Not found" });
-  const patch = todoUpdateSchema.parse(req.body);
-  const updated = { ...current, ...patch };
-  todos.set(id, updated);
-  res.json({ data: updated });
-}
+  async getById(
+    req: Request,
+    res: Response,
+    _next: NextFunction
+  ): Promise<void> {
+    const id = this.parseId(req);
+    const todo = this.todos.get(id);
+    if (!todo) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    res.json({ data: todo });
+  }
 
-export async function remove(req: Request, res: Response, next: NextFunction) {
-  const id = Number(req.params.id);
-  if (!todos.has(id)) return res.status(404).json({ error: "Not found" });
-  todos.delete(id);
-  res.status(204).send();
-}
+  async create(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const payload = todoCreateSchema.parse(req.body);
+      const id = this.seq++;
+      const todo: Todo = { id, title: payload.title, done: false };
+      this.todos.set(id, todo);
+      res.status(201).json({ data: todo });
+    } catch (err) {
+      next(err);
+    }
+  }
 
-export async function test(req: Request, res: Response, next: NextFunction) {
-  await Database.instance.connect();
-  const r: any = (
-    await Database.instance.query(
-      "SELECT " + Number(req.params.param) + " AS value;"
-    )
-  ).rows;
-  if (!r) return res.status(404).json({ error: "Not found" });
-  const value = r[0]?.value;
-  console.log(value); //1
-  res.json({ data: value });
+  async replace(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const id = this.parseId(req);
+      if (!this.todos.has(id)) {
+        res.status(404).json({ error: "Not found" });
+        return;
+      }
+      const payload = todoCreateSchema.parse(req.body);
+      const todo: Todo = { id, title: payload.title, done: false };
+      this.todos.set(id, todo);
+      res.json({ data: todo });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async update(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const id = this.parseId(req);
+      const current = this.todos.get(id);
+      if (!current) {
+        res.status(404).json({ error: "Not found" });
+        return;
+      }
+      const patch = todoUpdateSchema.parse(req.body);
+      const updated: Todo = { ...current, ...patch };
+      this.todos.set(id, updated);
+      res.json({ data: updated });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async remove(
+    req: Request,
+    res: Response,
+    _next: NextFunction
+  ): Promise<void> {
+    const id = this.parseId(req);
+    if (!this.todos.has(id)) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    this.todos.delete(id);
+    res.status(204).send();
+  }
+
+  async test(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const r: any = (
+        await this.db.query(`SELECT ${Number(req.params.param)} AS value;`)
+      ).rows;
+      if (!r) {
+        res.status(404).json({ error: "Not found" });
+        return;
+      }
+      const value = r[0]?.value;
+      console.log(value);
+      res.json({ data: value });
+    } catch (err) {
+      next(err);
+    }
+  }
 }
