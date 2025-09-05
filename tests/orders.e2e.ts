@@ -1,9 +1,7 @@
 import request from "supertest";
 import app from "../src/app";
 import setup, { resetDatabase, teardown } from "./helpers/db-setup-e2e";
-import { similarAsset, userPortfolio } from "./mocks/responses";
-import { BadRequestError, NotFoundError } from "../src/app/errors/appErrors";
-import { LONG_STRING, MALICIOUS_QUERY, NEW_BUY_ORDER } from "./mocks/requests";
+import { NEW_BUY_ORDER } from "./mocks/requests";
 
 beforeAll(async () => {
   await setup();
