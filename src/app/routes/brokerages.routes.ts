@@ -6,28 +6,42 @@ const controller = new BrokerageController();
 
 /**
  * @swagger
- * /api/portfolio/{param}:
+ * /api/assets/{asset}:
  *   get:
- *     summary: retorna param
- *     description: Devuelve un To-Do específico por su ID.
- *     tags: [To-Dos]
+ *     summary: Busca activos por ticker o nombre
+ *     description: Retorna un listado de activos que coinciden con el criterio de búsqueda (ticker o nombre).
+ *     tags:
+ *       - Activos
  *     parameters:
  *       - in: path
- *         name: param
+ *         name: asset
  *         required: true
  *         schema:
- *           type: integer
- *         description: El param
+ *           type: string
+ *         description: El ticker o nombre del activo a buscar
  *     responses:
  *       200:
- *         description: To-Do encontrado y devuelto.
+ *         description: Lista de activos similares encontrada y devuelta.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Todo'
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
  *       404:
- *         description: To-Do no encontrado.
+ *         description: Activo no encontrado o criterio de búsqueda no proporcionado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Not found"
+ *       500:
+ *         description: Error interno del servidor.
  */
-router.get("/portfolio/:param", controller.test.bind(controller));
+router.get("/assets/:asset", controller.findAssets.bind(controller));
 
 export default router;

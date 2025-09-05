@@ -1,24 +1,21 @@
 import { Request, Response, NextFunction } from "express";
-import { Database } from "../../connectors/postgresBD";
+import { AssetService } from "../services/AssetService";
+import { Asset } from "../domain/types";
+import { sanitize } from "../../utils/sanitize";
 
 export class BrokerageController {
-  private db: Database = Database.instance;
+  assetsService: AssetService = AssetService.withDefaults();
 
-  constructor() {
-    this.db.connect();
-  }
-
-  async test(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async findAssets(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
-      const r: any = (
-        await this.db.query(`SELECT ${Number(req.params.param)} AS value;`)
-      ).rows;
-      if (!r) {
-        res.status(404).json({ error: "Not found" });
-        return;
-      }
-      const value = r[0]?.value;
-      res.json({ data: value });
+      const assetToFind = String(req.params.asset || "").trim();
+      sanitize(assetToFind);
+      const assets: Asset[] = await this.assetsService.findSimilar(assetToFind);
+      res.json({ data: assets });
     } catch (err) {
       next(err);
     }
