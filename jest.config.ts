@@ -8,8 +8,8 @@ const config: Config = {
     "^.+\\.tsx?$": ["ts-jest", { useESM: true }],
   },
   extensionsToTreatAsEsm: [".ts"],
-  globalSetup: "<rootDir>/src/tests/setup-e2e.ts",
-  globalTeardown: "<rootDir>/src/tests/teardown-e2e.ts",
+  globalSetup: "<rootDir>/tests/setup-e2e.ts",
+  globalTeardown: "<rootDir>/tests/teardown-e2e.ts",
   testTimeout: 60000,
 };
 

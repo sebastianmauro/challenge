@@ -15,5 +15,5 @@
     "isolatedModules": true,
     "types": ["jest", "node"]
   },
-  "include": ["src", "src/tests"]
+  "include": ["src"]
 }
