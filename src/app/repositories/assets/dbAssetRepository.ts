@@ -1,6 +1,6 @@
 import { QueryResultRow } from "pg";
 import { Database } from "../../../connectors/postgresBD";
-import { Asset } from "../../domain/types";
+import { Asset } from "../../domain/asset";
 import { AssetRepository } from "./assetRepository";
 
 export class DbAssetRepository implements AssetRepository {

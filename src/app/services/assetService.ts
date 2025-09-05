@@ -1,9 +1,9 @@
-import { Asset } from "../domain/types";
+import { Asset } from "../domain/asset";
 import { AssetRepository } from "../repositories/assets/assetRepository";
 import { DbAssetRepository } from "../repositories/assets/dbAssetRepository";
 
 export class AssetService {
-  assetRepository: AssetRepository;
+  private assetRepository: AssetRepository;
 
   static withDefaults() {
     return new AssetService(new DbAssetRepository());

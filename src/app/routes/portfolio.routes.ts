@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { AssetsController } from "../controllers/assets.controllers";
+import { PortfolioController } from "../controllers/portfolio.controllers";
 
-const assetsRouter = Router();
-const controller = new AssetsController();
+const portfolioRouter = Router();
+const controller = new PortfolioController();
 
 /**
  * @swagger
- * /api/assets/{asset}:
+ * /api/portfolios/{user}:
  *   get:
  *     summary: Busca activos por ticker o nombre
  *     description: Retorna un listado de activos que coinciden con el criterio de búsqueda (ticker o nombre).
@@ -14,7 +14,7 @@ const controller = new AssetsController();
  *       - Activos
  *     parameters:
  *       - in: path
- *         name: asset
+ *         name: user
  *         required: true
  *         schema:
  *           type: string
@@ -42,6 +42,6 @@ const controller = new AssetsController();
  *       500:
  *         description: Error interno del servidor.
  */
-assetsRouter.get("/:asset", controller.findAssets.bind(controller));
+portfolioRouter.get("/:user", controller.getPortfolio.bind(controller));
 
-export default assetsRouter;
+export default portfolioRouter;

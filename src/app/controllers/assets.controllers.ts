@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { AssetService } from "../services/assetService";
-import { Asset } from "../domain/types";
-import { sanitize } from "../../utils/sanitize";
+import { Asset } from "../domain/asset";
+import { sanitizeString } from "../../utils/sanitizeString";
 
 export class AssetsController {
-  assetsService: AssetService = AssetService.withDefaults();
+  private assetsService: AssetService = AssetService.withDefaults();
 
   async findAssets(
     req: Request,
@@ -12,8 +12,7 @@ export class AssetsController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const assetToFind = String(req.params.asset || "").trim();
-      sanitize(assetToFind);
+      const assetToFind = sanitizeString(req);
       const assets: Asset[] = await this.assetsService.findSimilar(assetToFind);
       res.json({ data: assets });
     } catch (err) {
