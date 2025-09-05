@@ -94,6 +94,7 @@ export class OrdersService {
 
   private async resolvePrice(order: OrderToBeCreated) {
     let priceToPersist: number;
+    //TODO: use polimorfism and double dispatch with await this.resolveMarketPrice(order.ticker);
     if (order.orderType === OrderType.MARKET) {
       const marketPrice = await this.resolveMarketPrice(order.ticker);
       priceToPersist = marketPrice;
@@ -114,7 +115,7 @@ export class OrdersService {
   }
 
   private async resolveMarketPrice(ticker: string): Promise<number> {
-    const candidates = await this.assetService.findSimilar(ticker);
+    const candidates = await this.assetService.findSimilar(ticker); // TODO: use find by Id
     if (!candidates || candidates.length === 0) {
       throw new NotFoundError(`No se encontró el activo ${ticker}.`);
     }

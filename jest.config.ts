@@ -9,6 +9,7 @@ const config: Config = {
   },
   extensionsToTreatAsEsm: [".ts"],
   globalSetup: "<rootDir>/tests/helpers/db-setup-e2e.ts",
+  maxWorkers: 1,
   testTimeout: 60000,
 };
 
