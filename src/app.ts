@@ -6,6 +6,7 @@ import assetsRouter from "./app/routes/assets.routes";
 import { notFound } from "./middlewares/notFound.middleware";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
 import portfolioRouter from "./app/routes/portfolio.routes";
+import ordersRouter from "./app/routes/orders.routes";
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.get("/health", (_req, res) => {
 
 app.use("/api/assets", assetsRouter);
 app.use("/api/portfolios", portfolioRouter);
+app.use("/api/orders", ordersRouter);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerOutput));
 
 app.use(notFound);

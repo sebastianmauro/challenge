@@ -1,8 +1,8 @@
 export class HeldAsset {
-  private readonly ticker: string;
-  private readonly sharesHeld: number;
-  private readonly positionValue: number;
-  private readonly returnPercent: number;
+  readonly ticker: string;
+  readonly sharesHeld: number;
+  readonly positionValue: number;
+  readonly returnPercent: number;
 
   constructor(
     ticker: string,
