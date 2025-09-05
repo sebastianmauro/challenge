@@ -1,5 +1,4 @@
 import { Asset } from "../domain/types";
-import { BadRequestError } from "../errors/appErrors";
 import { AssetRepository } from "../repositories/assets/assetRepository";
 import { DbAssetRepository } from "../repositories/assets/dbAssetRepository";
 

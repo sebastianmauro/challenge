@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { AssetService } from "../services/AssetService";
+import { AssetService } from "../services/assetService";
 import { Asset } from "../domain/types";
 import { sanitize } from "../../utils/sanitize";
 

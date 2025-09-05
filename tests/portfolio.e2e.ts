@@ -3,6 +3,7 @@ import app from "../src/app";
 import setup, { resetDatabase, teardown } from "./helpers/db-setup-e2e";
 import { similarAsset } from "./mocks/responses";
 import { BadRequestError } from "../src/app/errors/appErrors";
+import { LONG_STRING, MALICIOUS_QUERY } from "./mocks/requests";
 
 beforeAll(async () => {
   await setup();
@@ -36,20 +37,17 @@ describe("GET /portfolio/:userId", () => {
   });
 
   it("should return bad request error, for length", async () => {
-    const assetToFind =
-      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     const badRequestError = new BadRequestError();
     const res = await request(app)
-      .get(`/api/assets/${assetToFind}`)
+      .get(`/api/assets/${LONG_STRING}`)
       .expect(badRequestError.statusCode);
     expect(res.body.error.message).toBe("query too short/long");
   });
 
   it("should return bad request error for characters", async () => {
-    const assetToFind = "1; delete * from orders";
     const badRequestError = new BadRequestError();
     const res = await request(app)
-      .get(`/api/assets/${assetToFind}`)
+      .get(`/api/assets/${MALICIOUS_QUERY}`)
       .expect(badRequestError.statusCode);
     expect(res.body.error.message).toBe("invalid query");
   });
