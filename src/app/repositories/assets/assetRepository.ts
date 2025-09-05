@@ -1,4 +1,4 @@
-import { Asset } from "../../domain/types";
+import { Asset } from "../../domain/asset";
 
 export interface AssetRepository {
   findSimilar(assetToFind: string): Promise<Asset[]>;
