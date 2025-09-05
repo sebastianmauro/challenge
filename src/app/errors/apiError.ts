@@ -7,6 +7,10 @@ export abstract class AppError extends Error {
     this.statusCode = statusCode;
     this.isOperational = isOperational;
     Object.setPrototypeOf(this, new.target.prototype);
-    Error.captureStackTrace?.(this, this.constructor);
+    if (process.env.NODE_ENV != "production") {
+      Error.captureStackTrace?.(this, this.constructor);
+    } else {
+      this.stack = undefined;
+    }
   }
 }
