@@ -2,11 +2,11 @@ import { QueryResultRow } from "pg";
 import { HeldAsset } from "./heldAsset";
 
 export class Portfolio {
-  private readonly userId: number;
-  private readonly availableCash: number;
-  private readonly assetsValue: number;
-  private readonly totalAccountValue: number;
-  private readonly heldAssets: HeldAsset[];
+  readonly userId: number;
+  readonly availableCash: number;
+  readonly assetsValue: number;
+  readonly totalAccountValue: number;
+  readonly heldAssets: HeldAsset[];
 
   constructor(
     userId: number,
