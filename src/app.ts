@@ -2,7 +2,7 @@ import express from "express";
 import swaggerUi from "swagger-ui-express";
 import swaggerOutput from "../swagger-output.json" with { type: "json" };
 import cors from "cors";
-import brokerageRouter from "./app/routes/brokerages.routes";
+import assetsRouter from "./app/routes/assets.routes";
 import { notFound } from "./middlewares/notFound.middleware";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
 
@@ -15,7 +15,7 @@ app.get("/health", (_req, res) => {
   res.json({ status: "ok", uptime: process.uptime() });
 });
 
-app.use("/api", brokerageRouter);
+app.use("/api/assets", assetsRouter);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerOutput));
 
 app.use(notFound);

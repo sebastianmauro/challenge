@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { BrokerageController } from "../controllers/brokerages.controllers";
+import { AssetsController } from "../controllers/assets.controllers";
 
 const router = Router();
-const controller = new BrokerageController();
+const controller = new AssetsController();
 
 /**
  * @swagger
@@ -42,6 +42,6 @@ const controller = new BrokerageController();
  *       500:
  *         description: Error interno del servidor.
  */
-router.get("/assets/:asset", controller.findAssets.bind(controller));
+router.get("/:asset", controller.findAssets.bind(controller));
 
 export default router;

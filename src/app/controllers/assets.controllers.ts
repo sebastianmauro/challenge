@@ -3,7 +3,7 @@ import { AssetService } from "../services/assetService";
 import { Asset } from "../domain/types";
 import { sanitize } from "../../utils/sanitize";
 
-export class BrokerageController {
+export class AssetsController {
   assetsService: AssetService = AssetService.withDefaults();
 
   async findAssets(
