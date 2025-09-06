@@ -7,7 +7,12 @@ import {
   OrderType,
   PersistableOrder,
 } from "../domain/types";
-import { BadRequestError, NotFoundError } from "../errors/appErrors";
+import { NotFoundError } from "../errors/appErrors";
+import {
+  CashInsufficientError,
+  InvalidPriceError,
+  SharesInsufficientError,
+} from "../errors/domainErrors";
 import { DbOrdersRepository } from "../repositories/orders/dbOrdersRepository";
 import { OrdersRepository } from "../repositories/orders/ordersRepository";
 import { AssetService } from "./assetService";
@@ -77,16 +82,14 @@ export class OrdersService {
       const totalCost = order.quantity * priceToPersist;
       if (!this.hasEnoughCash(portfolio, totalCost)) {
         await this.persistRejected(order, priceToPersist);
-        throw new BadRequestError("Orden rechazada: saldo insuficiente.");
+        throw new CashInsufficientError();
       }
     } else {
       // SELL
       const sharesHeld = this.sharesHeldFor(portfolio, order.ticker);
       if (sharesHeld < order.quantity) {
         await this.persistRejected(order, priceToPersist);
-        throw new BadRequestError(
-          "Orden rechazada: no posee suficientes acciones para vender."
-        );
+        throw new SharesInsufficientError();
       }
     }
     return status;
@@ -105,9 +108,7 @@ export class OrdersService {
         !Number.isFinite(order.price) ||
         order.price <= 0
       ) {
-        throw new BadRequestError(
-          "El precio es requerido y debe ser > 0 para órdenes LIMIT."
-        );
+        throw new InvalidPriceError();
       }
       priceToPersist = order.price;
     }
@@ -117,7 +118,7 @@ export class OrdersService {
   private async resolveMarketPrice(ticker: string): Promise<number> {
     const candidates = await this.assetService.findSimilar(ticker); // TODO: use find by Id
     if (!candidates || candidates.length === 0) {
-      throw new NotFoundError(`No se encontró el activo ${ticker}.`);
+      throw new NotFoundError(`Not found asset: ${ticker}.`);
     }
     const asset =
       candidates.find(
@@ -125,7 +126,7 @@ export class OrdersService {
       ) ?? candidates[0];
     const price = Number(asset.currentPrice);
     if (!Number.isFinite(price) || price <= 0) {
-      throw new BadRequestError(`Precio de mercado inválido para ${ticker}.`);
+      throw new InvalidPriceError();
     }
     return price;
   }
