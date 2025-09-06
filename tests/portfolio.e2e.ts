@@ -3,6 +3,7 @@ import app from "../src/app";
 import setup, { resetDatabase, teardown } from "./helpers/db-setup-e2e";
 import { userPortfolio } from "./mocks/responses";
 import { BadRequestError, NotFoundError } from "../src/app/errors/appErrors";
+import { USER_ID } from "./mocks/requests";
 
 beforeAll(async () => {
   await setup();
@@ -18,8 +19,9 @@ afterAll(async () => {
 
 describe("GET /portfolio/:userId", () => {
   it("should return user 1 portfolio", async () => {
-    const userId = 1;
-    const res = await request(app).get(`/api/portfolios/${userId}`).expect(200);
+    const res = await request(app)
+      .get(`/api/portfolios/${USER_ID}`)
+      .expect(200);
     expect(res.body.toString()).toBe(userPortfolio.toString());
   });
 

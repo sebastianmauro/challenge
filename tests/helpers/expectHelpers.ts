@@ -1,5 +1,6 @@
 import { Database } from "../../src/connectors/postgresBD";
 import request from "supertest";
+import { BMA, METR, PAMP } from "../mocks/requests";
 
 export function portfolioProcessedOkBeforeMarketOrder(
   res: any,
@@ -7,7 +8,7 @@ export function portfolioProcessedOkBeforeMarketOrder(
   assetsValue: number,
   sharesHeld: number,
   positionValue: number
-): boolean {
+): void {
   expect(res.body).toHaveProperty("data");
 
   const { data } = res.body;
@@ -19,14 +20,14 @@ export function portfolioProcessedOkBeforeMarketOrder(
 
   expect(data.heldAssets).toEqual(
     expect.arrayContaining([
-      expect.objectContaining({ ticker: "BMA", sharesHeld: -10 }),
-      expect.objectContaining({ ticker: "PAMP", sharesHeld: sharesHeld }),
-      expect.objectContaining({ ticker: "METR", sharesHeld: 500 }),
+      expect.objectContaining({ ticker: BMA, sharesHeld: -10 }),
+      expect.objectContaining({ ticker: PAMP, sharesHeld: sharesHeld }),
+      expect.objectContaining({ ticker: METR, sharesHeld: 500 }),
     ])
   );
-  const bma = data.heldAssets.find((a: any) => a.ticker === "BMA");
-  const pamp = data.heldAssets.find((a: any) => a.ticker === "PAMP");
-  const metr = data.heldAssets.find((a: any) => a.ticker === "METR");
+  const bma = data.heldAssets.find((a: any) => a.ticker === BMA);
+  const pamp = data.heldAssets.find((a: any) => a.ticker === PAMP);
+  const metr = data.heldAssets.find((a: any) => a.ticker === METR);
 
   expect(bma).toBeDefined();
   expect(bma.positionValue).toBeCloseTo(-15028, 2);
@@ -39,7 +40,6 @@ export function portfolioProcessedOkBeforeMarketOrder(
   expect(metr).toBeDefined();
   expect(metr.positionValue).toBeCloseTo(114750, 2);
   expect(metr.returnPercent).toBeCloseTo(-1.0775862068965518, 6);
-  return true;
 }
 
 export async function getPortfolio(userId: number, app: any) {

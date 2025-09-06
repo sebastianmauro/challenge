@@ -22,6 +22,7 @@ import {
   InvalidPriceError,
   SharesInsufficientError,
 } from "../src/app/errors/domainErrors";
+import { OrderSide, OrderStatus, OrderType } from "../src/app/domain/types";
 
 let app: any;
 
@@ -44,15 +45,14 @@ describe("POST /order", () => {
       .post("/api/orders")
       .send(MARKET_BUY_ORDER)
       .expect(200);
-    expect(
-      portfolioProcessedOkBeforeMarketOrder(
-        res,
-        752074.15,
-        137681.85,
-        41,
-        37959.85
-      )
-    ).toBeTruthy();
+
+    portfolioProcessedOkBeforeMarketOrder(
+      res,
+      752074.15,
+      137681.85,
+      41,
+      37959.85
+    );
   });
 
   it("should add new sell order and return updated portfolio", async () => {
@@ -60,15 +60,13 @@ describe("POST /order", () => {
       .post("/api/orders")
       .send(MARKET_SELL_ORDER)
       .expect(200);
-    expect(
-      portfolioProcessedOkBeforeMarketOrder(
-        res,
-        753925.85,
-        135830.15,
-        39,
-        36108.15
-      )
-    ).toBeTruthy();
+    portfolioProcessedOkBeforeMarketOrder(
+      res,
+      753925.85,
+      135830.15,
+      39,
+      36108.15
+    );
   });
 
   it("creates a BUY LIMIT (status NEW) and portfolio remains unchanged", async () => {
@@ -83,9 +81,9 @@ describe("POST /order", () => {
     expectPortfolioUnchanged(before, after);
 
     await expectLastOrderRow(USER_ID, {
-      side: "BUY",
-      type: "LIMIT",
-      status: "NEW",
+      side: OrderSide.BUY,
+      type: OrderType.LIMIT,
+      status: OrderStatus.NEW,
       price: LIMIT_BUY_OK.price,
       ticker: LIMIT_BUY_OK.ticker,
     });
@@ -99,13 +97,13 @@ describe("POST /order", () => {
       .send(LIMIT_SELL_OK)
       .expect(200);
 
-    const after = res.body.data ?? res.body;
+    const after = res.body.data;
     expectPortfolioUnchanged(before, after);
 
     await expectLastOrderRow(USER_ID, {
-      side: "SELL",
-      type: "LIMIT",
-      status: "NEW",
+      side: OrderSide.SELL,
+      type: OrderType.LIMIT,
+      status: OrderStatus.NEW,
       price: LIMIT_SELL_OK.price,
       ticker: LIMIT_SELL_OK.ticker,
     });
@@ -117,9 +115,8 @@ describe("POST /order", () => {
       .post("/api/orders")
       .send(LIMIT_BUY_NO_PRICE)
       .expect(error.statusCode);
-    expect(String(res.body.error?.message || res.text).toLowerCase()).toContain(
-      "price"
-    );
+
+    expect(res.body.error.message).toBe(error.message);
   });
 
   it("rejects LIMIT with price <= 0 (400)", async () => {
@@ -128,22 +125,21 @@ describe("POST /order", () => {
       .post("/api/orders")
       .send(LIMIT_BUY_BAD_PRICE)
       .expect(error.statusCode);
-    expect(String(res.body.error?.message || res.text).toLowerCase()).toContain(
-      "price"
-    );
+    expect(res.body.error.message).toBe(error.message);
   });
 
   it("rejects LIMIT BUY when cash is insufficient (400) and persists REJECTED", async () => {
     const error = new CashInsufficientError();
-    await request(app)
+    const res = await request(app)
       .post("/api/orders")
       .send(LIMIT_BUY_NO_CASH)
       .expect(error.statusCode);
 
+    expect(res.body.error.message).toBe(error.message);
     await expectLastOrderRow(USER_ID, {
-      side: "BUY",
-      type: "LIMIT",
-      status: "REJECTED",
+      side: OrderSide.BUY,
+      type: OrderType.LIMIT,
+      status: OrderStatus.REJECTED,
       price: LIMIT_BUY_NO_CASH.price,
       ticker: LIMIT_BUY_NO_CASH.ticker,
     });
@@ -151,15 +147,16 @@ describe("POST /order", () => {
 
   it("rejects LIMIT SELL when shares are insufficient (400) and persists REJECTED", async () => {
     const error = new SharesInsufficientError();
-    await request(app)
+    const res = await request(app)
       .post("/api/orders")
       .send(LIMIT_SELL_NO_SHARES)
       .expect(error.statusCode);
 
+    expect(res.body.error.message).toBe(error.message);
     await expectLastOrderRow(USER_ID, {
-      side: "SELL",
-      type: "LIMIT",
-      status: "REJECTED",
+      side: OrderSide.SELL,
+      type: OrderType.LIMIT,
+      status: OrderStatus.REJECTED,
       price: LIMIT_SELL_NO_SHARES.price,
       ticker: LIMIT_SELL_NO_SHARES.ticker,
     });
