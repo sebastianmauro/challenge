@@ -7,6 +7,7 @@
     "swagger:generate": "node --experimental-specifier-resolution=node swagger.js",
     "dev": "tsx watch src/server.ts",
     "test:e2e": "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-specifier-resolution=node jest --runInBand --detectOpenHandles",
+    "test:unit": "jest --testMatch \"<rootDir>/**/unit/**/*.unit.test.ts\"",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
     "generate-swagger": "node swagger.js",
