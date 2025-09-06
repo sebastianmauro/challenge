@@ -23,7 +23,7 @@ export const LIMIT_BUY_OK = {
   quantity: 1,
   side: "BUY",
   orderType: "LIMIT",
-  price: 1000, // suficiente cash según seed
+  price: 1000,
 };
 
 export const LIMIT_SELL_OK = {
@@ -50,22 +50,22 @@ export const LIMIT_BUY_BAD_PRICE = {
   quantity: 1,
   side: "BUY",
   orderType: "LIMIT",
-  price: 0, // inválido
+  price: 0,
 };
 
 export const LIMIT_BUY_NO_CASH = {
   ticker: "PAMP",
   user: USER_ID,
-  quantity: 10_000_000, // exagerado para forzar falta de cash
+  quantity: 10_000_000,
   side: "BUY",
   orderType: "LIMIT",
-  price: 1_000_000, // idem
+  price: 1_000_000,
 };
 
 export const LIMIT_SELL_NO_SHARES = {
   ticker: "PAMP",
   user: USER_ID,
-  quantity: 999_999, // más que la tenencia
+  quantity: 999_999,
   side: "SELL",
   orderType: "LIMIT",
   price: 1000,
