@@ -25,10 +25,10 @@ const controller = new AssetsController();
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 data:
- *                   type: array
+ *               $ref: '#/components/schemas/AssetsResponse'
+ *             examples:
+ *               sample:
+ *                 $ref: '#/components/examples/AssetList'
  *       404:
  *         description: Activo no encontrado o criterio de búsqueda no proporcionado.
  *         content:

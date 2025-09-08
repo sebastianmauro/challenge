@@ -11,7 +11,7 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
     "generate-swagger": "node swagger.js",
-    "startDev": "npm run swagger:generate && npm run dev"
+    "start:dev": "npm run swagger:generate && npm run dev"
   },
   "keywords": [],
   "author": "",

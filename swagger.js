@@ -1,4 +1,3 @@
-// swagger.js
 import swaggerJSDoc from "swagger-jsdoc";
 import fs from "fs";
 import path from "path";
@@ -21,41 +20,19 @@ const options = {
         description: "Servidor local",
       },
     ],
-    components: {
-      schemas: {
-        Todo: {
-          type: "object",
-          properties: {
-            id: {
-              type: "integer",
-              example: 1,
-            },
-            title: {
-              type: "string",
-              example: "Aprender Swagger",
-            },
-            done: {
-              type: "boolean",
-              example: false,
-            },
-          },
-        },
-      },
-    },
   },
   apis: [
     path.resolve(__dirname, "./src/app/routes/*.routes.ts"),
     path.resolve(__dirname, "./src/app/routes/*.js"),
+    path.resolve(__dirname, "./docs/*.ts"),
   ],
 };
 
-// Generar la especificación
 const swaggerSpec = swaggerJSDoc(options);
 
-// Guardar en archivo JSON
 const outputFile = path.resolve(__dirname, "./swagger-output.json");
 fs.writeFileSync(outputFile, JSON.stringify(swaggerSpec, null, 2));
 
-console.log("✅ swagger-output.json generado correctamente");
+console.log("✅ swagger-output.json generated successfully.");
 
 export default swaggerSpec;
