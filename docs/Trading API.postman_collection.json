@@ -1,0 +1,175 @@
+{
+	"info": {
+		"_postman_id": "440946b6-e153-442c-8554-30ab1431e55d",
+		"name": "Trading API",
+		"description": "Colección para testear la Web API de trading.  \nVariables:\n\n- baseUrl: URL base de la API (ej: [http://localhost:3000/api](http://localhost:3000/api))\n    \n\nEndpoints incluidos:\n\n- GET /assets/:asset\n    \n- POST /orders\n    \n- GET /portfolios/:user",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19034305"
+	},
+	"item": [
+		{
+			"name": "Assets",
+			"item": [
+				{
+					"name": "Buscar activos por ticker o nombre",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"pm.test('Content-Type is JSON', function () {",
+									"  pm.response.to.have.header('Content-Type');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/assets/:asset",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"assets",
+								":asset"
+							],
+							"variable": [
+								{
+									"key": "asset",
+									"value": "PAMP",
+									"description": "Ticker o nombre del activo a buscar"
+								}
+							]
+						},
+						"description": "Retorna un listado de activos que coinciden con el criterio de búsqueda (ticker o nombre)."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Orders",
+			"item": [
+				{
+					"name": "Crear orden (BUY/SELL)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Ajustá el cuerpo según MARKET o LIMIT:",
+									"// - orderType: 'MARKET' => price opcional/ignorado",
+									"// - orderType: 'LIMIT'  => price requerido"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"pm.test('Respuesta es JSON', function () {",
+									"  pm.response.to.be.withBody;",
+									"  pm.response.to.be.json;",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user\": 1,\n  \"ticker\": \"PAMP\",\n  \"side\": \"BUY\",\n  \"orderType\": \"MARKET\",\n  \"quantity\": 10,\n  \"price\": null\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders"
+							]
+						},
+						"description": "Crea una nueva orden de compra o venta.\nCampos sugeridos del body:\n  - user (number)        : ID de usuario\n  - ticker (string)      : Ticker del instrumento (ej: 'AAPL')\n  - side ('BUY'|'SELL')  : Lado de la orden\n  - orderType ('MARKET'|'LIMIT'): Tipo de orden\n  - quantity (number)    : Cantidad de acciones (entero > 0)\n  - price (number|null)  : Requerido si orderType = 'LIMIT'\n"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Portfolios",
+			"item": [
+				{
+					"name": "Obtener portafolio de un usuario",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"pm.test('Content-Type is JSON', function () {",
+									"  pm.response.to.have.header('Content-Type');",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/portfolios/:user",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"portfolios",
+								":user"
+							],
+							"variable": [
+								{
+									"key": "user",
+									"value": "1",
+									"description": "ID del usuario"
+								}
+							]
+						},
+						"description": "Recupera el portafolio asociado a un usuario específico."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000/api",
+			"type": "string"
+		}
+	]
+}
