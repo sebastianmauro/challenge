@@ -1,4 +1,5 @@
 import { Asset } from "../domain/asset";
+import { OrderToBeCreated } from "../domain/orderToBeCreated";
 import { AssetRepository } from "../repositories/assets/assetRepository";
 import { DbAssetRepository } from "../repositories/assets/dbAssetRepository";
 
@@ -14,7 +15,10 @@ export class AssetService {
   }
 
   async findSimilar(assetToFind: string): Promise<Asset[]> {
-    const assets = await this.assetRepository.findSimilar(assetToFind);
-    return assets;
+    return await this.assetRepository.findSimilar(assetToFind);
+  }
+
+  async findByTicker(assetToFind: OrderToBeCreated): Promise<Asset> {
+    return await this.assetRepository.findByTicker(assetToFind);
   }
 }

@@ -1,4 +1,5 @@
 import { Asset } from "../domain/asset";
+import { MarketOrder } from "../domain/marketOrder";
 import { OrderToBeCreated } from "../domain/orderToBeCreated";
 import { Portfolio } from "../domain/portfolio";
 import {
@@ -42,7 +43,7 @@ export class OrdersService {
   }
 
   async createOrderFor(order: OrderToBeCreated): Promise<Portfolio> {
-    const price: number = await this.resolvePrice(order);
+    const price: number = await order.resolvePrice(this);
 
     const status: OrderStatus = await this.ensureCapacity(order, price);
 
@@ -95,35 +96,15 @@ export class OrdersService {
     return status;
   }
 
-  private async resolvePrice(order: OrderToBeCreated) {
-    let priceToPersist: number;
-    //TODO: use polimorfism and double dispatch with await this.resolveMarketPrice(order.ticker);
-    if (order.orderType === OrderType.MARKET) {
-      const marketPrice = await this.resolveMarketPrice(order.ticker);
-      priceToPersist = marketPrice;
-    } else {
-      // LIMIT
-      if (
-        order.price === undefined ||
-        !Number.isFinite(order.price) ||
-        order.price <= 0
-      ) {
-        throw new InvalidPriceError();
-      }
-      priceToPersist = order.price;
+  async resolveMarketPrice(order: MarketOrder): Promise<number> {
+    const candidates = await this.assetService.findByTicker(order); // TODO: use find by Id
+    if (!candidates) {
+      throw new NotFoundError(`Not found asset: ${order.ticker}.`);
     }
-    return priceToPersist;
+    return this.getPrice(candidates);
   }
 
-  private async resolveMarketPrice(ticker: string): Promise<number> {
-    const candidates = await this.assetService.findSimilar(ticker); // TODO: use find by Id
-    if (!candidates || candidates.length === 0) {
-      throw new NotFoundError(`Not found asset: ${ticker}.`);
-    }
-    const asset =
-      candidates.find(
-        (a: Asset) => a.ticket === ticker || (a as any).ticket === ticker
-      ) ?? candidates[0];
+  private getPrice(asset: Asset) {
     const price = Number(asset.currentPrice);
     if (!Number.isFinite(price) || price <= 0) {
       throw new InvalidPriceError();
