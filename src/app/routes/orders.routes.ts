@@ -21,7 +21,7 @@ const controller = new OrdersController();
  *             properties:
  *               ticker:
  *                 type: string
- *                 example: AAPL
+ *                 example: PAMP
  *               user:
  *                 type: integer
  *                 example: 1
@@ -51,14 +51,61 @@ const controller = new OrdersController();
  *               - orderType
  *     responses:
  *       200:
- *         description: Orden creada exitosamente.
+ *         description: Orden creada exitosamente, devuelve portfolio actualizado.
  *         content:
  *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 data:
- *                   type: object
+ *               schema:
+ *                 type: object
+ *                 additionalProperties: false
+ *                 required: [data]
+ *                 properties:
+ *                   data:
+ *                     type: object
+ *                     additionalProperties: false
+ *                     required:
+ *                       - userId
+ *                       - availableCash
+ *                       - assetsValue
+ *                       - totalAccountValue
+ *                       - heldAssets
+ *                     properties:
+ *                       userId:
+ *                         type: integer
+ *                         description: ID del usuario.
+ *                       availableCash:
+ *                         type: number
+ *                         format: double
+ *                         description: Efectivo disponible para operar.
+ *                       assetsValue:
+ *                         type: number
+ *                         format: double
+ *                         description: Valor total de las posiciones.
+ *                       totalAccountValue:
+ *                         type: number
+ *                         format: double
+ *                         description: Efectivo + valor de posiciones.
+ *                       heldAssets:
+ *                         type: array
+ *                         description: Detalle de activos en cartera.
+ *                         items:
+ *                           type: object
+ *                           additionalProperties: false
+ *                           required: [ticker, sharesHeld, positionValue, returnPercent]
+ *                           properties:
+ *                             ticker:
+ *                               type: string
+ *                               description: Símbolo del instrumento (ej. BMA, PAMP).
+ *                             sharesHeld:
+ *                               type: integer
+ *                               description: Cantidad de acciones (puede ser negativa si es short).
+ *                             positionValue:
+ *                               type: number
+ *                               format: double
+ *                               description: Valor monetario de la posición.
+ *                             returnPercent:
+ *                               type: number
+ *                               format: double
+ *                               description: Rendimiento total en fracción (0.12 = 12%).
  *       400:
  *         description: Request inválido.
  *         content:
