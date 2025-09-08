@@ -1,13 +1,14 @@
 import dotenv from "dotenv";
 import app from "./app";
 import { Database } from "./connectors/postgresBD";
+import logger from "./utils/logger";
 
 dotenv.config();
 
 const PORT = Number(process.env.PORT) || 3000;
 
 const server = app.listen(PORT, () => {
-  console.log(`[api] listening on http://localhost:${PORT}`);
+  logger.info(`[api] listening on http://localhost:${PORT}`);
 });
 
 //graceful shutdown
