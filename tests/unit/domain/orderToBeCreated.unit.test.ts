@@ -1,5 +1,5 @@
-import { OrderToBeCreated } from "../../../src/app/domain/orderToBeCreated";
-import { OrderSide, OrderType } from "../../../src/app/domain/types";
+import { createOrderFrom } from "../../../src/app/domain/factories/orderFactory";
+import { OrderType } from "../../../src/app/domain/types";
 import { BadRequestError } from "../../../src/app/errors/appErrors";
 import { InvalidPriceError } from "../../../src/app/errors/domainErrors";
 import { makeReq } from "./helpers";
@@ -11,7 +11,7 @@ describe("OrderToBeCreated.from", () => {
       price: 123.45,
       ticker: " pamp ",
     });
-    const order = OrderToBeCreated.from(req);
+    const order = createOrderFrom(req);
 
     expect(order.user).toBe(req.user);
     expect(order.ticker).toBe(req.ticker.trim().toUpperCase());
@@ -23,7 +23,7 @@ describe("OrderToBeCreated.from", () => {
 
   it("creates a LIMIT order correctly: uses the provided price", () => {
     const req = makeReq({ orderType: OrderType.LIMIT, price: 150.25 });
-    const order = OrderToBeCreated.from(req);
+    const order = createOrderFrom(req);
 
     expect(order.orderType).toBe(req.orderType);
     expect(order.price).toBe(req.price);
@@ -31,16 +31,16 @@ describe("OrderToBeCreated.from", () => {
 
   it("throws BadRequestError if the body is invalid (not an object)", () => {
     // @ts-expect-error runtime test
-    expect(() => OrderToBeCreated.from(undefined)).toThrow(BadRequestError);
+    expect(() => createOrderFrom(undefined)).toThrow(BadRequestError);
     // @ts-expect-error runtime test
-    expect(() => OrderToBeCreated.from(null)).toThrow(BadRequestError);
+    expect(() => createOrderFrom(null)).toThrow(BadRequestError);
   });
 
   it("throws 'Ticker required' if ticker is empty or whitespace", () => {
     const req = makeReq({ ticker: "   " });
-    expect(() => OrderToBeCreated.from(req)).toThrow(BadRequestError);
+    expect(() => createOrderFrom(req)).toThrow(BadRequestError);
     try {
-      OrderToBeCreated.from(req);
+      createOrderFrom(req);
     } catch (e: any) {
       expect(e).toBeInstanceOf(BadRequestError);
       expect(String(e.message)).toContain("Ticker required");
@@ -48,19 +48,19 @@ describe("OrderToBeCreated.from", () => {
   });
 
   it("throws BadRequestError if user is not a positive integer", () => {
-    expect(() => OrderToBeCreated.from(makeReq({ user: 0 }))).toThrow(
+    expect(() => createOrderFrom(makeReq({ user: 0 }))).toThrow(
       BadRequestError
     );
-    expect(() => OrderToBeCreated.from(makeReq({ user: 1.2 as any }))).toThrow(
+    expect(() => createOrderFrom(makeReq({ user: 1.2 as any }))).toThrow(
       BadRequestError
     );
   });
 
   it("throws 'Quantity must be > 0' if quantity <= 0", () => {
     const req = makeReq({ quantity: 0 });
-    expect(() => OrderToBeCreated.from(req)).toThrow(BadRequestError);
+    expect(() => createOrderFrom(req)).toThrow(BadRequestError);
     try {
-      OrderToBeCreated.from(req);
+      createOrderFrom(req);
     } catch (e: any) {
       expect(e).toBeInstanceOf(BadRequestError);
       expect(String(e.message)).toContain("Quantity must be > 0");
@@ -70,9 +70,9 @@ describe("OrderToBeCreated.from", () => {
   it("throws 'Side invalid' if side does not belong to the enum", () => {
     // @ts-expect-error invalid value
     const req = makeReq({ side: "HOLD" });
-    expect(() => OrderToBeCreated.from(req)).toThrow(BadRequestError);
+    expect(() => createOrderFrom(req)).toThrow(BadRequestError);
     try {
-      OrderToBeCreated.from(req);
+      createOrderFrom(req);
     } catch (e: any) {
       expect(String(e.message)).toContain("Side invalid");
     }
@@ -81,9 +81,9 @@ describe("OrderToBeCreated.from", () => {
   it("throws 'Order type invalid' if orderType does not belong to the enum", () => {
     // @ts-expect-error invalid value
     const req = makeReq({ orderType: "STOP" });
-    expect(() => OrderToBeCreated.from(req)).toThrow(BadRequestError);
+    expect(() => createOrderFrom(req)).toThrow(BadRequestError);
     try {
-      OrderToBeCreated.from(req);
+      createOrderFrom(req);
     } catch (e: any) {
       expect(String(e.message)).toContain("Order type invalid");
     }
@@ -94,28 +94,28 @@ describe("OrderToBeCreated.from", () => {
       orderType: OrderType.LIMIT,
       price: undefined as any,
     });
-    expect(() => OrderToBeCreated.from(req)).toThrow(InvalidPriceError);
+    expect(() => createOrderFrom(req)).toThrow(InvalidPriceError);
   });
 
   it("LIMIT with price NaN or <= 0 ⇒ InvalidPriceError", () => {
     expect(() =>
-      OrderToBeCreated.from(
+      createOrderFrom(
         makeReq({ orderType: OrderType.LIMIT, price: Number.NaN })
       )
     ).toThrow(InvalidPriceError);
 
     expect(() =>
-      OrderToBeCreated.from(makeReq({ orderType: OrderType.LIMIT, price: 0 }))
+      createOrderFrom(makeReq({ orderType: OrderType.LIMIT, price: 0 }))
     ).toThrow(InvalidPriceError);
 
     expect(() =>
-      OrderToBeCreated.from(makeReq({ orderType: OrderType.LIMIT, price: -5 }))
+      createOrderFrom(makeReq({ orderType: OrderType.LIMIT, price: -5 }))
     ).toThrow(InvalidPriceError);
   });
 
   it("always normalizes ticker (trim + uppercase)", () => {
     const req = makeReq({ ticker: "  pamp  " });
-    const order = OrderToBeCreated.from(req);
+    const order = createOrderFrom(req);
     expect(order.ticker).toBe("PAMP");
   });
 });
