@@ -3,6 +3,7 @@ import { OrderSide, OrderType } from "./types";
 import { OrderToBeCreated } from "./orderToBeCreated";
 import { InvalidPriceError } from "../errors/domainErrors";
 import { OrdersService } from "../services/orderService";
+import logger from "../../utils/logger";
 
 export class LimitOrder extends OrderToBeCreated {
   price: number;
@@ -21,6 +22,7 @@ export class LimitOrder extends OrderToBeCreated {
       !Number.isFinite(aPrice) ||
       aPrice <= 0
     ) {
+      logger.error("Invalid price for LimitOrder", { aPrice });
       throw new InvalidPriceError();
     }
     super(aUser, aTicker, aSide, aOrderType, aQuantity);

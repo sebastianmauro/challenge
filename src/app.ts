@@ -8,11 +8,13 @@ import { errorHandler } from "./middlewares/errorHandler.middleware";
 import portfolioRouter from "./app/routes/portfolio.routes";
 import ordersRouter from "./app/routes/orders.routes";
 import { Database } from "./connectors/postgresBD";
+import requestLogger from "./middlewares/requestLogger.middleware";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(requestLogger);
 
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", uptime: process.uptime() });

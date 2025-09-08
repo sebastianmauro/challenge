@@ -1,5 +1,6 @@
 import { Pool, QueryResultRow } from "pg";
 import "dotenv/config";
+import logger from "../utils/logger";
 
 type QueryParams = any[] | undefined;
 
@@ -11,6 +12,7 @@ export class Database {
   private constructor() {
     const connectionString = process.env.DATABASE_URL;
     if (!connectionString) {
+      logger.error("DATABASE_URL is not set in environment variables");
       throw new Error("DATABASE_URL is required");
     }
     this.pool = new Pool({ connectionString });
@@ -23,7 +25,7 @@ export class Database {
     } finally {
       client.release();
     }
-    console.log("[DB] ready");
+    logger.info("Database connection established");
   }
 
   public static get instance(): Database {
@@ -42,7 +44,9 @@ export class Database {
     const start = Date.now();
     const res = await this.pool.query<T>(text, params);
     const duration = Date.now() - start;
-    console.log("[DB] query", { text, duration, rows: res.rowCount });
+    logger.debug(
+      `DB query | ${text} | Duration: ${duration}ms | Rows: ${res.rowCount}`
+    );
     return { rows: res.rows };
   }
 
@@ -50,6 +54,6 @@ export class Database {
     if (this.closed) return;
     this.closed = true;
     await this.pool.end();
-    console.log("database disconnected");
+    logger.info("Database connection closed");
   }
 }
