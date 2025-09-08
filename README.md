@@ -1,4 +1,3 @@
-````markdown
 # cocos-challenge-backend
 
 Backend del challenge con **Node.js + Express** y documentación **OpenAPI/Swagger**.  
@@ -22,7 +21,6 @@ git clone <url-del-repo>
 cd challenge
 npm i
 ```
-````
 
 ---
 
