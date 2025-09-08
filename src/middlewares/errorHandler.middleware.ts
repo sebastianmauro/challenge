@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { AppError } from "../app/errors/apiError";
+import { ApiError } from "../app/errors/apiError";
 
 export function errorHandler(
   err: unknown,
@@ -9,7 +9,7 @@ export function errorHandler(
 ) {
   // unknown error
   const isProd = process.env.NODE_ENV === "production";
-  if (!(err instanceof AppError)) {
+  if (!(err instanceof ApiError)) {
     const message = isProd
       ? "Internal server error"
       : (err as Error)?.message ?? "Internal error";
