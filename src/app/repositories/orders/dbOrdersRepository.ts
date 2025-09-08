@@ -6,10 +6,6 @@ import { NotFoundError } from "../../errors/appErrors";
 export class DbOrdersRepository implements OrdersRepository {
   private db: Database = Database.instance;
 
-  constructor() {
-    this.db.connect();
-  }
-
   public async createOrder(p: PersistableOrder): Promise<void> {
     const sql = `
       WITH ins AS (
@@ -39,7 +35,7 @@ export class DbOrdersRepository implements OrdersRepository {
     const { rows } = await this.db.query(sql, params);
 
     if (!rows || rows.length === 0) {
-      throw new NotFoundError(`Instrumento no encontrado`);
+      throw new NotFoundError(`Instrument not found`);
     }
   }
 }

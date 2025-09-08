@@ -7,10 +7,6 @@ import { NotFoundError } from "../../errors/appErrors";
 export class DbPortfolioRepository implements PortfolioRepository {
   private db: Database = Database.instance;
 
-  constructor() {
-    this.db.connect();
-  }
-
   public async getPortfolioFor(user: number): Promise<Portfolio> {
     const queryResult: QueryResultRow[] = (
       await this.db.query(
@@ -26,7 +22,7 @@ export class DbPortfolioRepository implements PortfolioRepository {
                   END
               ) AS cash_disponible
           FROM orders
-          WHERE userId = ${user}
+          WHERE userId = $1
           AND status = 'FILLED'
           GROUP BY userId
       ),
@@ -44,7 +40,7 @@ export class DbPortfolioRepository implements PortfolioRepository {
               ) AS acciones_poseidas
           FROM orders o
           JOIN instruments i ON o.instrumentId = i.id
-          WHERE o.userId = ${user}
+          WHERE o.userId = $1
           AND o.status = 'FILLED' AND i.type != 'MONEDA'
           GROUP BY o.userId, o.instrumentId, i.ticker, i.name
       ),
@@ -72,7 +68,8 @@ export class DbPortfolioRepository implements PortfolioRepository {
       FROM user_positions_summary up
       JOIN market_data_latest mdl ON up.instrumentId = mdl.instrumentId
       LEFT JOIN user_cash_balance ucb ON up.userId = ucb.userId
-      GROUP BY up.userId, ucb.cash_disponible;`
+      GROUP BY up.userId, ucb.cash_disponible;`,
+        [user]
       )
     ).rows;
     this.validateResults(queryResult);

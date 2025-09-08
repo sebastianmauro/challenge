@@ -18,14 +18,13 @@ const setup = async () => {
     adminPool = new Pool({ connectionString: url });
     await adminPool.query(schemaSQL);
     await adminPool.query(seedSQL);
-    await Database.instance.connect();
   }
 };
 
 export const resetDatabase = async () => {
   if (!adminPool) {
     throw new Error(
-      "La base de datos no está inicializada. Ejecuta setup() primero."
+      "Database not initialized. Call setup() before resetting the database."
     );
   }
   await adminPool.query(`

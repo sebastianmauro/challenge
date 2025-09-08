@@ -16,18 +16,23 @@ export class Database {
     this.pool = new Pool({ connectionString });
   }
 
+  async assertReady(): Promise<void> {
+    const client = await this.pool.connect();
+    try {
+      await client.query("SELECT 1;");
+    } finally {
+      client.release();
+    }
+    console.log("[DB] ready");
+  }
+
   public static get instance(): Database {
     if (!this._instance) this._instance = new Database();
     return this._instance;
   }
 
-  // for tests
   public static reset(): void {
     this._instance = null;
-  }
-
-  public async connect(): Promise<void> {
-    await this.query("SELECT 1;");
   }
 
   public async query<T extends QueryResultRow = QueryResultRow>(

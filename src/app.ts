@@ -7,6 +7,7 @@ import { notFound } from "./middlewares/notFound.middleware";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
 import portfolioRouter from "./app/routes/portfolio.routes";
 import ordersRouter from "./app/routes/orders.routes";
+import { Database } from "./connectors/postgresBD";
 
 const app = express();
 
@@ -15,6 +16,18 @@ app.use(express.json());
 
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", uptime: process.uptime() });
+});
+app.get("/readiness", async (_req, res) => {
+  res.status(200).send("ok");
+});
+app.get("/startup", async (_req, res) => {
+  try{
+    await Database.instance.assertReady();
+    return res.status(200).send("ok");
+
+  }catch(err){
+    return res.status(503).send("initializing");
+  }
 });
 
 app.use("/api/assets", assetsRouter);
