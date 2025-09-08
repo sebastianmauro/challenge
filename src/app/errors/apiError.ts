@@ -1,3 +1,5 @@
+import logger from "../../utils/logger";
+
 export abstract class ApiError extends Error {
   public readonly statusCode: number;
   public readonly isOperational: boolean;

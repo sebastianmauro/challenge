@@ -1,3 +1,4 @@
+import logger from "../../utils/logger";
 import { Asset } from "../domain/asset";
 import { MarketOrder } from "../domain/marketOrder";
 import { OrderToBeCreated } from "../domain/orderToBeCreated";
@@ -74,6 +75,7 @@ export class OrdersService {
     const sharesHeld = this.sharesHeldFor(portfolio, order.ticker);
     if (sharesHeld < order.quantity) {
       await this.save(order, priceToPersist, OrderStatus.REJECTED);
+      logger.error("Insufficient shares to sell", { order, sharesHeld });
       throw new SharesInsufficientError();
     }
   }
@@ -86,6 +88,7 @@ export class OrdersService {
     const totalCost = order.quantity * priceToPersist;
     if (!this.hasEnoughCash(portfolio, totalCost)) {
       await this.save(order, priceToPersist, OrderStatus.REJECTED);
+      logger.error("Insufficient cash to buy", { order, totalCost, portfolio });
       throw new CashInsufficientError();
     }
   }
@@ -101,6 +104,7 @@ export class OrdersService {
   async resolveMarketPrice(order: MarketOrder): Promise<number> {
     const candidates = await this.assetService.findByTicker(order); // TODO: use find by Id
     if (!candidates) {
+      logger.error("Asset not found for market order", { order });
       throw new NotFoundError(`Not found asset: ${order.ticker}.`);
     }
     return this.getPrice(candidates);
@@ -109,6 +113,7 @@ export class OrdersService {
   private getPrice(asset: Asset) {
     const price = Number(asset.currentPrice);
     if (!Number.isFinite(price) || price <= 0) {
+      logger.error("Invalid price for asset", { asset });
       throw new InvalidPriceError();
     }
     return price;

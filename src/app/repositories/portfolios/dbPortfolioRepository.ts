@@ -3,6 +3,7 @@ import { Database } from "../../../connectors/postgresBD";
 import { PortfolioRepository } from "./portfolioRepository";
 import { Portfolio } from "../../domain/portfolio";
 import { NotFoundError } from "../../errors/appErrors";
+import logger from "../../../utils/logger";
 
 export class DbPortfolioRepository implements PortfolioRepository {
   private db: Database = Database.instance;
@@ -78,6 +79,7 @@ export class DbPortfolioRepository implements PortfolioRepository {
 
   private validateResults(queryResult: QueryResultRow[]) {
     if (queryResult.length === 0) {
+      logger.error("No portfolio found for user");
       throw new NotFoundError();
     }
   }

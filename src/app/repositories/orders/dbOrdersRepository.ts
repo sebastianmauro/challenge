@@ -2,6 +2,7 @@ import { Database } from "../../../connectors/postgresBD";
 import { OrdersRepository } from "./ordersRepository";
 import { NotFoundError } from "../../errors/appErrors";
 import { PersistableOrder } from "../../dtos/persistableOrder";
+import logger from "../../../utils/logger";
 
 export class DbOrdersRepository implements OrdersRepository {
   private db: Database = Database.instance;
@@ -35,6 +36,7 @@ export class DbOrdersRepository implements OrdersRepository {
     const { rows } = await this.db.query(sql, params);
 
     if (!rows || rows.length === 0) {
+      logger.error("Failed to create order", { order: p });
       throw new NotFoundError(`Instrument not found`);
     }
   }
