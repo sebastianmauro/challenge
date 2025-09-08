@@ -1,7 +1,7 @@
 import { Database } from "../../../connectors/postgresBD";
 import { OrdersRepository } from "./ordersRepository";
-import { PersistableOrder } from "../../domain/types";
 import { NotFoundError } from "../../errors/appErrors";
+import { PersistableOrder } from "../../dtos/persistableOrder";
 
 export class DbOrdersRepository implements OrdersRepository {
   private db: Database = Database.instance;

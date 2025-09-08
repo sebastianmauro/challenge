@@ -2,12 +2,8 @@ import { Asset } from "../domain/asset";
 import { MarketOrder } from "../domain/marketOrder";
 import { OrderToBeCreated } from "../domain/orderToBeCreated";
 import { Portfolio } from "../domain/portfolio";
-import {
-  OrderSide,
-  OrderStatus,
-  OrderType,
-  PersistableOrder,
-} from "../domain/types";
+import { OrderSide, OrderStatus, OrderType } from "../domain/types";
+import { PersistableOrder } from "../dtos/persistableOrder";
 import { NotFoundError } from "../errors/appErrors";
 import {
   CashInsufficientError,
@@ -45,54 +41,60 @@ export class OrdersService {
   async createOrderFor(order: OrderToBeCreated): Promise<Portfolio> {
     const price: number = await order.resolvePrice(this);
 
-    const status: OrderStatus = await this.ensureCapacity(order, price);
+    const status: OrderStatus = await this.assertSufficientFundsOrHoldings(
+      order,
+      price
+    );
 
     await this.save(order, price, status);
 
     return await this.portfolioService.getPortfolioFor(order.user);
   }
 
-  private async save(
-    order: OrderToBeCreated,
-    price: number,
-    status: OrderStatus
-  ) {
-    const persistable: PersistableOrder = {
-      user: order.user,
-      ticker: order.ticker,
-      side: order.side,
-      orderType: order.orderType,
-      quantity: order.quantity,
-      price: price,
-      status,
-    };
-    await this.orderRepository.createOrder(persistable);
-  }
-
-  private async ensureCapacity(
+  private async assertSufficientFundsOrHoldings(
     order: OrderToBeCreated,
     priceToPersist: number
   ) {
     const portfolio = await this.portfolioService.getPortfolioFor(order.user);
+    const status: OrderStatus = this.getStatus(order);
+
+    if (order.side === OrderSide.BUY) {
+      await this.ensureCanBuy(order, priceToPersist, portfolio);
+    } else {
+      await this.ensureCanSell(portfolio, order, priceToPersist);
+    }
+    return status;
+  }
+
+  private async ensureCanSell(
+    portfolio: Portfolio,
+    order: OrderToBeCreated,
+    priceToPersist: number
+  ) {
+    const sharesHeld = this.sharesHeldFor(portfolio, order.ticker);
+    if (sharesHeld < order.quantity) {
+      await this.save(order, priceToPersist, OrderStatus.REJECTED);
+      throw new SharesInsufficientError();
+    }
+  }
+
+  private async ensureCanBuy(
+    order: OrderToBeCreated,
+    priceToPersist: number,
+    portfolio: Portfolio
+  ) {
+    const totalCost = order.quantity * priceToPersist;
+    if (!this.hasEnoughCash(portfolio, totalCost)) {
+      await this.save(order, priceToPersist, OrderStatus.REJECTED);
+      throw new CashInsufficientError();
+    }
+  }
+
+  private getStatus(order: OrderToBeCreated) {
     const willBeFilledNow = order.orderType === OrderType.MARKET;
     const status: OrderStatus = willBeFilledNow
       ? OrderStatus.FILLED
       : OrderStatus.NEW;
-
-    if (order.side === OrderSide.BUY) {
-      const totalCost = order.quantity * priceToPersist;
-      if (!this.hasEnoughCash(portfolio, totalCost)) {
-        await this.persistRejected(order, priceToPersist);
-        throw new CashInsufficientError();
-      }
-    } else {
-      // SELL
-      const sharesHeld = this.sharesHeldFor(portfolio, order.ticker);
-      if (sharesHeld < order.quantity) {
-        await this.persistRejected(order, priceToPersist);
-        throw new SharesInsufficientError();
-      }
-    }
     return status;
   }
 
@@ -124,19 +126,20 @@ export class OrdersService {
     );
   }
 
-  private async persistRejected(
+  private async save(
     order: OrderToBeCreated,
-    price: number
-  ): Promise<void> {
-    const rejected: PersistableOrder = {
+    price: number,
+    status: OrderStatus
+  ) {
+    const persistable: PersistableOrder = {
       user: order.user,
       ticker: order.ticker,
       side: order.side,
       orderType: order.orderType,
       quantity: order.quantity,
-      price,
-      status: OrderStatus.REJECTED,
+      price: price,
+      status,
     };
-    await this.orderRepository.createOrder(rejected);
+    await this.orderRepository.createOrder(persistable);
   }
 }

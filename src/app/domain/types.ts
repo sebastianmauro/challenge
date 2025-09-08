@@ -14,13 +14,3 @@ export enum OrderStatus {
   REJECTED = "REJECTED",
   CANCELLED = "CANCELLED",
 }
-
-export type PersistableOrder = {
-  user: number;
-  ticker: string;
-  side: OrderSide;
-  orderType: OrderType;
-  quantity: number;
-  price: number;
-  status: OrderStatus;
-};
