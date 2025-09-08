@@ -1,7 +1,7 @@
 # cocos-challenge-backend
 
-Backend del challenge con **Node.js + Express** y documentación **OpenAPI/Swagger**.  
-Incluye endpoints para **órdenes**, **portafolios** y **búsqueda de activos**, conexión a **PostgreSQL** y tests **unitarios** y **end-to-end**.
+Backend del challenge con **Node.js + Express** y documentación **OpenAPI/Swagger** **Postman**.  
+Incluye endpoints para **órdenes**, **portafolios** y **búsqueda de activos**, conexión a **PostgreSQL**, tests **unitarios**, **end-to-end** y una coleccion de postman para probar la API.
 
 ---
 
@@ -9,8 +9,7 @@ Incluye endpoints para **órdenes**, **portafolios** y **búsqueda de activos**,
 
 - **Node.js** ≥ 18 LTS (recomendado)
 - **npm** ≥ 9
-- **PostgreSQL** en ejecución
-- Cadena de conexión válida en `DATABASE_URL`
+- Cadena de conexión válida a Postgres en `DATABASE_URL`
 
 ---
 
@@ -34,7 +33,7 @@ NODE_ENV=dev
 DATABASE_URL=postgres://<USER_NAME>:<PASSWORD>@<HOST>:<PORT>/<DATABASE>?sslmode=require
 ```
 
-> **Nota:** si tu instancia local no requiere SSL, elimina `?sslmode=require` o ajusta según tu entorno.
+> **Nota:** si probas con una instancia local que no requiere SSL, elimina `?sslmode=require` o ajusta según tu entorno, pero con las credenciales tal cual fueron enviadas por email y el formato brindado en DATABASE_URL, la api se conecta sola.
 
 ---
 
@@ -63,6 +62,10 @@ Swagger UI: `http://localhost:3000/api-docs`
 
 > La especificación se **regenera** automáticamente cuando usas `npm run start:dev`.
 
+Postman collection
+
+> Dentro de la carpeta ./docs se encuentran tanto la collection de postman para probar la api, como el enviroment de postman con la base url (port 3000)
+
 ---
 
 ## Scripts disponibles
@@ -71,7 +74,7 @@ Swagger UI: `http://localhost:3000/api-docs`
 | ------------------- | ------------------------------------------------------------------ |
 | `npm run start:dev` | Genera/actualiza Swagger y arranca el servidor en modo desarrollo. |
 | `npm run dev`       | Arranca el servidor en desarrollo **sin** regenerar Swagger.       |
-| `npm run test:e2e`  | Ejecuta pruebas **end-to-end**.                                    |
+| `npm run test:e2e`  | Ejecuta pruebas **end-to-end**, _requiere docker levantado_.       |
 | `npm run test:unit` | Ejecuta pruebas **unitarias**.                                     |
 
 ---
@@ -90,7 +93,7 @@ npm run test:unit
 npm run test:e2e
 ```
 
-## Para las pruebas e2e se utilizo supertest y testcontainer, con lo cual se debe tener levantado docker para que automaticamente se cree la bd con los datos seeds
+Para las pruebas e2e se utilizo supertest y testcontainer, con lo cual se debe tener levantado docker para que automaticamente se cree la bd con los datos seeds
 
 ## Endpoints clave (resumen)
 
@@ -133,3 +136,4 @@ Si estableces `NODE_ENV=production`, la aplicación ajusta su comportamiento par
 
 - **`DATABASE_URL` inválida o sin SSL:** verifica el formato y la necesidad de `sslmode=require`.
 - **Swagger no muestra cambios:** usa `npm run start:dev` para regenerar la especificación.
+- **No corren los test e2e:** recuerda tener arriba el deamon de docker (puede ser docker desktop)
